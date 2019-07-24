@@ -1,2 +1,3 @@
 project('simd-examples', 'cpp')
-executable('simd_examples.x', 'src/main.cpp')
+benchmark = dependency('benchmark')
+executable('simd_examples.x', 'src/main.cpp', dependencies : benchmark)
