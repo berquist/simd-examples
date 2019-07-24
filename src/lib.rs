@@ -1,4 +1,5 @@
-/// https://medium.com/@Razican/learning-simd-with-rust-by-finding-planets-b85ccfb724c3
+/// Initial implementations inspired by
+/// https://medium.com/@Razican/learning-simd-with-rust-by-finding-planets-b85ccfb724c3.
 pub mod mars;
 
 use std::{f64, mem};
@@ -9,17 +10,23 @@ use std::arch::x86_64::*;
 #[cfg(target_arch = "x86")]
 use std::arch::x86::*;
 
+/// Implementation taken from
+/// https://medium.com/@Razican/learning-simd-with-rust-by-finding-planets-b85ccfb724c3.
 pub fn calculate_var(t: f64, var: &[(f64, f64, f64)]) -> f64 {
     var.iter()
         .fold(0_f64, |term, &(a, b, c)| term + a * (b + c * t).cos())
 }
 
+/// Implementation taken from
+/// https://medium.com/@Razican/learning-simd-with-rust-by-finding-planets-b85ccfb724c3.
 #[inline]
 pub fn calculate_var_inline(t: f64, var: &[(f64, f64, f64)]) -> f64 {
     var.iter()
         .fold(0_f64, |term, &(a, b, c)| term + a * (b + c * t).cos())
 }
 
+/// Implementation taken from
+/// https://medium.com/@Razican/learning-simd-with-rust-by-finding-planets-b85ccfb724c3.
 pub unsafe fn vector_term(
     (a1, b1, c1): (f64, f64, f64),
     (a2, b2, c2): (f64, f64, f64),
@@ -46,9 +53,12 @@ pub unsafe fn vector_term(
     mem::transmute(term)
 }
 
+/// Implementation taken from
+/// https://medium.com/@Razican/learning-simd-with-rust-by-finding-planets-b85ccfb724c3.
 #[target_feature(enable = "avx")]
+#[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
 #[allow(unsafe_code)]
-unsafe fn calculate_var_avx_inner(t: f64, var: &[(f64, f64, f64)]) -> f64 {
+pub unsafe fn calculate_var_avx_inner(t: f64, var: &[(f64, f64, f64)]) -> f64 {
     var.chunks(4)
         .map(|vec| match vec {
             &[(a1, b1, c1), (a2, b2, c2), (a3, b3, c3), (a4, b4, c4)] => {
@@ -74,6 +84,8 @@ unsafe fn calculate_var_avx_inner(t: f64, var: &[(f64, f64, f64)]) -> f64 {
         .sum()
 }
 
+/// Implementation taken from
+/// https://medium.com/@Razican/learning-simd-with-rust-by-finding-planets-b85ccfb724c3.
 #[inline]
 #[allow(unsafe_code)]
 pub fn calculate_var_avx(t: f64, var: &[(f64, f64, f64)]) -> f64 {
