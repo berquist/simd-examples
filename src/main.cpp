@@ -7,6 +7,7 @@
 
 #include <benchmark/benchmark.h>
 
+// Taken from https://en.cppreference.com/w/cpp/memory/align
 template <std::size_t N>
 struct MyAllocator {
     char data[N];
@@ -24,6 +25,12 @@ struct MyAllocator {
         }
         return nullptr;
     }
+};
+
+// Taken from https://en.cppreference.com/w/cpp/language/alignas
+struct alignas(32) avx2_t
+{
+    double avx2_data[4];
 };
 
 void add_pair_manual(const std::array<double, 2> &v1,
@@ -130,6 +137,10 @@ int main(int argc, char *argv[]) {
     av4[0] = 5.0; av4[1] = 6.0; av4[2] = 7.0; av4[3] = 8.0;
     ares[0] = 0.0; ares[1] = 0.0; ares[2] = 0.0; ares[3] = 0.0;
 
+    const avx2_t avx2_v3 = {1.0, 2.0, 3.0, 4.0};
+    const avx2_t avx2_v4 = {5.0, 6.0, 7.0, 8.0};
+    avx2_t avx2_res = {0.0, 0.0, 0.0, 0.0};
+
     std::cout << "AVX2 addition of length 4 vectors" << std::endl;
     res2 = {0.0, 0.0, 0.0, 0.0};
     std::cout << res2[0] << " " << res2[1] << " " << res2[2] << " " << res2[3] << std::endl;
@@ -140,6 +151,8 @@ int main(int argc, char *argv[]) {
     add_quad_avx2(v3, v4, res2);
     std::cout << res2[0] << " " << res2[1] << " " << res2[2] << " " << res2[3] << std::endl;
     add_quad_avx2_aligned(av3, av4, ares);
+    std::cout << ares[0] << " " << ares[1] << " " << ares[2] << " " << ares[3] << std::endl;
+    add_quad_avx2_aligned(avx2_v3.avx2_data, avx2_v4.avx2_data, avx2_res.avx2_data);
     std::cout << ares[0] << " " << ares[1] << " " << ares[2] << " " << ares[3] << std::endl;
 
     ::benchmark::Initialize(&argc, argv);
@@ -202,8 +215,19 @@ static void BM_add_quad_avx2_aligned(benchmark::State &state) {
     }
 }
 
+static void BM_add_quad_avx2_aligned_2(benchmark::State &state) {
+    const avx2_t avx2_v3 = {1.0, 2.0, 3.0, 4.0};
+    const avx2_t avx2_v4 = {5.0, 6.0, 7.0, 8.0};
+    avx2_t avx2_res = {0.0, 0.0, 0.0, 0.0};
+    for (auto _ : state) {
+        avx2_res.avx2_data[0] = 0.0; avx2_res.avx2_data[1] = 0.0; avx2_res.avx2_data[2] = 0.0; avx2_res.avx2_data[3] = 0.0;
+        add_quad_avx2_aligned(avx2_v3.avx2_data, avx2_v4.avx2_data, avx2_res.avx2_data);
+    }
+}
+
 BENCHMARK(BM_add_pair_manual);
 BENCHMARK(BM_add_pair_sse2);
 BENCHMARK(BM_add_quad_manual);
 BENCHMARK(BM_add_quad_avx2);
 BENCHMARK(BM_add_quad_avx2_aligned);
+BENCHMARK(BM_add_quad_avx2_aligned_2);
