@@ -1,77 +1,8 @@
-#include <array>
 #include <iostream>
-#include <memory>
-
-#include <emmintrin.h>
-#include <immintrin.h>
 
 #include <benchmark/benchmark.h>
 
-// Taken from https://en.cppreference.com/w/cpp/memory/align
-template <std::size_t N>
-struct MyAllocator {
-    char data[N];
-    void* p;
-    std::size_t sz;
-
-    MyAllocator() : p(data), sz(N) {}
-
-    template <typename T> T *aligned_alloc(std::size_t a = alignof(T)) {
-        if (std::align(a, sizeof(T), p, sz)) {
-            T* result = reinterpret_cast<T*>(p);
-            p = (char*)p + sizeof(T);
-            sz -= sizeof(T);
-            return result;
-        }
-        return nullptr;
-    }
-};
-
-// Taken from https://en.cppreference.com/w/cpp/language/alignas
-struct alignas(32) avx2_t
-{
-    double avx2_data[4];
-};
-
-void add_pair_manual(const std::array<double, 2> &v1,
-                     const std::array<double, 2> &v2,
-                     std::array<double, 2> &out) {
-    out[0] = v1[0] + v2[0];
-    out[1] = v1[1] + v2[1];
-}
-
-void add_pair_sse2(const std::array<double, 2> &v1,
-                   const std::array<double, 2> &v2,
-                   std::array<double, 2> &out) {
-    _mm_store_pd(out.data(),
-                 _mm_add_pd(_mm_load_pd(v1.data()),
-                            _mm_load_pd(v2.data())));
-}
-
-void add_quad_manual(const std::array<double, 4> &l,
-                     const std::array<double, 4> &r,
-                     std::array<double, 4> &out) {
-    out[0] = l[0] + r[0];
-    out[1] = l[1] + r[1];
-    out[2] = l[2] + r[2];
-    out[3] = l[3] + r[3];
-}
-
-void add_quad_avx2_aligned(const double *l,
-                           const double *r,
-                           double *out) {
-    _mm256_store_pd(out,
-                    _mm256_add_pd(_mm256_load_pd(l),
-                                  _mm256_load_pd(r)));
-}
-
-void add_quad_avx2(const std::array<double, 4> &l,
-                   const std::array<double, 4> &r,
-                   std::array<double, 4> &out) {
-    _mm256_storeu_pd(out.data(),
-                     _mm256_add_pd(_mm256_loadu_pd(l.data()),
-                                   _mm256_loadu_pd(r.data())));
-}
+#include "functions.h"
 
 int main(int argc, char *argv[]) {
     std::cout << sizeof(double) << std::endl;
