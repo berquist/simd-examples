@@ -73,11 +73,8 @@ int main(int argc, char *argv[]) {
     avx2_t avx2_res = {0.0, 0.0, 0.0, 0.0};
 
     std::cout << "AVX2 addition of length 4 vectors" << std::endl;
-    res2 = {0.0, 0.0, 0.0, 0.0};
     std::cout << res2[0] << " " << res2[1] << " " << res2[2] << " " << res2[3] << std::endl;
     add_quad_manual(v3, v4, res2);
-    std::cout << res2[0] << " " << res2[1] << " " << res2[2] << " " << res2[3] << std::endl;
-    res2 = {0.0, 0.0, 0.0, 0.0};
     std::cout << res2[0] << " " << res2[1] << " " << res2[2] << " " << res2[3] << std::endl;
     add_quad_avx2(v3, v4, res2);
     std::cout << res2[0] << " " << res2[1] << " " << res2[2] << " " << res2[3] << std::endl;
@@ -96,7 +93,6 @@ static void BM_add_pair_manual(benchmark::State &state) {
     const std::array<double, 2> v2 { 3.0, 4.0 };
     std::array<double, 2> res;
     for (auto _ : state) {
-        res = {0.0, 0.0};
         add_pair_manual(v1, v2, res);
     }
 }
@@ -106,7 +102,6 @@ static void BM_add_pair_sse2(benchmark::State &state) {
     const std::array<double, 2> v2 { 3.0, 4.0 };
     std::array<double, 2> res;
     for (auto _ : state) {
-        res = {0.0, 0.0};
         add_pair_sse2(v1, v2, res);
     }
 }
@@ -116,7 +111,6 @@ static void BM_add_quad_manual(benchmark::State &state) {
     const std::array<double, 4> v4 { 5.0, 6.0, 7.0, 8.0 };
     std::array<double, 4> res2;
     for (auto _ : state) {
-        res2 = {0.0, 0.0, 0.0, 0.0};
         add_quad_manual(v3, v4, res2);
     }
 }
@@ -126,7 +120,6 @@ static void BM_add_quad_avx2(benchmark::State &state) {
     const std::array<double, 4> v4 { 5.0, 6.0, 7.0, 8.0 };
     std::array<double, 4> res2;
     for (auto _ : state) {
-        res2 = {0.0, 0.0, 0.0, 0.0};
         add_quad_avx2(v3, v4, res2);
     }
 }
@@ -141,7 +134,6 @@ static void BM_add_quad_avx2_aligned(benchmark::State &state) {
     av3[0] = 1.0; av3[1] = 2.0; av3[2] = 3.0; av3[3] = 4.0;
     av4[0] = 5.0; av4[1] = 6.0; av4[2] = 7.0; av4[3] = 8.0;
     for (auto _ : state) {
-        ares[0] = 0.0; ares[1] = 0.0; ares[2] = 0.0; ares[3] = 0.0;
         add_quad_avx2_aligned(av3, av4, ares);
     }
 }
@@ -151,7 +143,6 @@ static void BM_add_quad_avx2_aligned_2(benchmark::State &state) {
     const avx2_t avx2_v4 = {5.0, 6.0, 7.0, 8.0};
     avx2_t avx2_res = {0.0, 0.0, 0.0, 0.0};
     for (auto _ : state) {
-        avx2_res.avx2_data[0] = 0.0; avx2_res.avx2_data[1] = 0.0; avx2_res.avx2_data[2] = 0.0; avx2_res.avx2_data[3] = 0.0;
         add_quad_avx2_aligned(avx2_v3.avx2_data, avx2_v4.avx2_data, avx2_res.avx2_data);
     }
 }

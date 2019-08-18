@@ -42,4 +42,3 @@ void add_quad_avx2(const std::array<double, 4> &l,
                      _mm256_add_pd(_mm256_loadu_pd(l.data()),
                                    _mm256_loadu_pd(r.data())));
 }
-
