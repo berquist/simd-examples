@@ -3,5 +3,4 @@ project('simd-examples', 'cpp',
 benchmark = dependency('benchmark')
 executable('simd_examples.x', 'src/functions.cpp', 'src/main.cpp',
            dependencies : benchmark,
-           cpp_args : ['-mavx2'])
-           # cpp_args : ['-mavx2', '-O1'])
+           cpp_args : ['-mavx2', '-g', '-O3'])
